@@ -1,7 +1,7 @@
 import * as gameService from './services/gameService'
 import { useEffect, useState } from "react";
-
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import uniqid from 'uniqid';
 
 import './App.css';
 import Header from './components/header/Header';
@@ -14,20 +14,38 @@ import GameDetails from './components/gameDetails/GameDetails';
 
 function App() {
   const [games, setGames] = useState([]);
+  const navigate = useNavigate();
 
-const addComment = (gameId, comment) => {
-  setGames(state => {
-    const game = state.find(x => x._id);
-    
-    const comments = game.comments || [];
-    comments.push(comment);
-    
-    return [
-      ...state.filter(x => x._id !== gameId),
-      {...game, comments: comments}
-    ]
-  })
-}
+  const addComment = (gameId, comment) => {
+    setGames(state => {
+      const game = state.find(x => x._id);
+
+      const comments = game.comments || [];
+      comments.push(comment);
+
+      return [
+        ...state.filter(x => x._id !== gameId),
+        { ...game, comments: comments }
+      ];
+    });
+  };
+
+  const onCreateGameSubmit = async (data) => {
+    addGameHandler()
+    console.log(data)
+
+  }
+
+  const addGameHandler = (gameData) => {
+    setGames(state => [
+      ...state,
+      {
+        ...gameData,
+        _id: uniqid()
+      }
+    ]);
+    navigate('/catalog')
+  };
 
   useEffect(() => {
     gameService.getAll()
@@ -46,7 +64,7 @@ const addComment = (gameId, comment) => {
           <Route path="/" element={<Home games={games} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/create" element={<CreateGame />} />
+          <Route path="/create" element={<CreateGame onCreateGameSubmit={onCreateGameSubmit} addGameHandler={addGameHandler}/>} />
           <Route path="/catalog" element={<Catalog games={games} />} />
           <Route path="catalog/:gameId" element={<GameDetails games={games} addComment={addComment} />} />
         </Routes>
@@ -84,7 +102,7 @@ const addComment = (gameId, comment) => {
         </form>
       </section>
       {/*Details Page*/}
- 
+
       {/* Catalogue */}
 
     </div>

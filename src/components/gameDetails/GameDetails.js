@@ -11,7 +11,7 @@ const GameDetails = ({
         text: ''
     });
 
-    const game = games.find(x => x._id == gameId);
+    const game = games.find(x => x._id === gameId);
 
     const addCommentHandler = (e) => {
         e.preventDefault();
